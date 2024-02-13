@@ -233,7 +233,7 @@ int print_root_directory(FILE *imageFile, ExFatBootSector *bootSector)
 
 void print_usage()
 {
-    fprintf(stderr, "Usage: exfat [-s] [-r] [-d rescue_dir] image_file\n");
+    fprintf(stderr, "Usage: exfat [-s] [-r] [-d rescue_dir] [-b beginning_cluster] [-e end_cluster] image_file\n");
 }
 
 int main(int argc, char **argv)
