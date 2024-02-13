@@ -2,7 +2,7 @@
 Utility to search and recover files from a corrupt exFAT volume.
 
 Usage:
-`Usage: sef [-s] [-r] [-d rescue_dir] image_file`
+`sef [-s] [-r] [-d rescue_dir] image_file`
 
 This utility will search entire disk for directory entries and attempt to save file contents. Requires valid boot sector to detect disk geometry. If the media has read errors (and generally), it is recommended to perform the search on a disk image. A copy of the corrupt media can be dome using utility such as [ddrescue](https://www.gnu.org/software/ddrescue/) or `dd` (when media reads without errors).
 
