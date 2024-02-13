@@ -224,9 +224,11 @@ void parse_directory(FILE *imageFile, ExFatBootSector *bootSector, uint64_t dirO
     } // loop over file entries
 }
 
-void print_root_directory(FILE *imageFile, ExFatBootSector *bootSector)
+int print_root_directory(FILE *imageFile, ExFatBootSector *bootSector)
 {
-    parse_directory(imageFile, bootSector, get_root_directory(bootSector), 0, NULL);
+    int files_saved = 0;
+    parse_directory(imageFile, bootSector, get_root_directory(bootSector), 0, NULL, &files_saved);
+    return files_saved;
 }
 
 void print_usage()
@@ -239,9 +241,11 @@ int main(int argc, char **argv)
     int flags, opt;
     int do_search = 0;
     int do_rescue = 0;
+    int cluster_begin = 0;
+    int cluster_end = -1;
     char rescue_dir[256] = "rescue.dir";
 
-    while ((opt = getopt(argc, argv, "srd:"))!= -1) {
+    while ((opt = getopt(argc, argv, "srd:b:e:"))!= -1) {
         switch(opt) {
         case 's':
             do_search = 1;
@@ -251,6 +255,12 @@ int main(int argc, char **argv)
             break;
         case 'd':
             strncpy(rescue_dir, optarg, sizeof(rescue_dir));
+            break;
+        case 'b':
+            cluster_begin = atoi(optarg);
+            break;
+        case 'e':
+            cluster_end = atoi(optarg);
             break;
         default:
             print_usage();
@@ -293,7 +303,12 @@ int main(int argc, char **argv)
     printf("Searching for any directory entries...\n");
     int files_saved = 0;
     uint64_t cluster = bootSector.FirstClusterOfRootDirectory;
-    while(cluster < bootSector.ClusterCount) {
+    if (cluster_begin > cluster && cluster_begin < bootSector.ClusterCount)
+        cluster = cluster_begin;
+    uint64_t last_cluster = bootSector.ClusterCount + 2;
+    if (cluster_end > cluster && cluster_end < bootSector.ClusterCount + 2)
+        last_cluster = cluster_end;
+    while(cluster < last_cluster) {
         uint64_t offset = get_cluster_offset(&bootSector, cluster);
         if (cluster % 512 == 0)
             printf("%lu [%lx] (%.3f%%) files saved: %d\n", cluster, offset, (float)cluster / (float)bootSector.ClusterCount * 100.0, files_saved);
