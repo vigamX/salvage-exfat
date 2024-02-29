@@ -132,7 +132,6 @@ void parse_directory(FILE *imageFile, ExFatBootSector *bootSector, uint64_t dirO
     ExFatFileDirectoryEntry fileEntry;
     ExFatStreamExtensionEntry streamEntry;
     ExFatFileNameEntry nameEntry;
-    *files_saved = 0;
     int record_count = 0;
     while ((record_count < cluster_size / sizeof(fileEntry)) && fread(&fileEntry, sizeof(fileEntry), 1, imageFile) == 1) {
 //	    printf("%x ", fileEntry.EntryType);
@@ -316,6 +315,7 @@ int main(int argc, char **argv)
         cluster++;
     }
 
+    printf("Total files saved: %d\n", files_saved);
     fclose(imageFile);
     return 0;
 }
